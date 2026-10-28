@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ service.name }}</title>
+</head>
+<body>
+    <h1>{{ service.name }}</h1>
+    <p><strong>ID:</strong> {{ service.id }}</p>
+    <p><strong>Ціна:</strong> {{ service.price }}</p>
+    <p><strong>Тривалість:</strong> {{ service.duration }} хв</p>
+    
+    <a href="{% url 'services_list' %}">Назад до списку</a>
+</body>
+</html>

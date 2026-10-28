@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Замовлення {{ order.id }}</title>
+</head>
+<body>
+    <h1>Замовлення #{{ order.id }}</h1>
+    <p><strong>ID клієнта:</strong> {{ order.client_id }}</p>
+    <p><strong>ID послуги:</strong> {{ order.service_id }}</p>
+    <p><strong>Статус:</strong> {{ order.status }}</p>
+    <p><strong>Ціна:</strong> {{ order.total_price }}</p>
+    
+    <a href="{% url 'orders_list' %}">Назад до списку</a>
+</body>
+</html>

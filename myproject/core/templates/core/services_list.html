@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        nav { background-color: #e59696; padding: 10px; margin-bottom: 20px; }
+        nav a { color: white; margin: 0 10px; text-decoration: none; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}">Головна</a> |
+        <a href="{% url 'clients_list' %}">Клієнти</a> |
+        <a href="{% url 'services_list' %}">Послуги</a> |
+        <a href="{% url 'orders_list' %}">Замовлення</a> |
+        <a href="{% url 'about' %}">Про проєкт</a>
+    </nav>
+
+    <h1>{{ title }}</h1>
+    
+    {% if services %}
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Ціна</th>
+                <th>Тривалість (хв)</th>
+                <th>Дія</th>
+            </tr>
+            {% for service in services %}
+            <tr>
+                <td>{{ service.id }}</td>
+                <td>{{ service.name }}</td>
+                <td>{{ service.price }}</td>
+                <td>{{ service.duration }}</td>
+                <td><a href="{% url 'service_detail' service.id %}">Переглянути</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Немає послуг.</p>
+    {% endif %}
+</body>
+</html>

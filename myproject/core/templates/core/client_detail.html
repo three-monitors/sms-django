@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ client.name }}</title>
+</head>
+<body>
+    <h1>{{ client.name }}</h1>
+    <p><strong>ID:</strong> {{ client.id }}</p>
+    <p><strong>Телефон:</strong> {{ client.phone }}</p>
+    <p><strong>Email:</strong> {{ client.email }}</p>
+    
+    <h2>Замовлення клієнта</h2>
+    {% if orders %}
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Статус</th>
+                <th>Ціна</th>
+            </tr>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Немає замовлень.</p>
+    {% endif %}
+    
+    <a href="{% url 'clients_list' %}">Назад до списку</a>
+</body>
+</html>

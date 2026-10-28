@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{{ title }}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        nav { background-color: #e59696; padding: 10px; margin-bottom: 20px; }
-        nav a { color: white; margin: 0 10px; text-decoration: none; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
 </head>
 <body>
     <nav>
         <a href="{% url 'home' %}">Головна</a> |
         <a href="{% url 'clients_list' %}">Клієнти</a> |
         <a href="{% url 'services_list' %}">Послуги</a> |
-        <a href="{% url 'orders_list' %}">Замовлення</a>
+        <a href="{% url 'orders_list' %}">Замовлення</a> |
+        <a href="{% url 'dashboard' %}">Дашборд</a> |
         <a href="{% url 'about' %}">Про проєкт</a>
     </nav>
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}">Головна</a> |
+        <a href="{% url 'clients_list' %}">Клієнти</a> |
+        <a href="{% url 'services_list' %}">Послуги</a> |
+        <a href="{% url 'orders_list' %}">Замовлення</a> |
+        <a href="{% url 'dashboard' %}">Дашборд</a> |
+        <a href="{% url 'about' %}">Про проєкт</a>
+    </nav>
+
+    <h1>{{ title }}</h1>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ total_clients }}</div>
+        <div>Клієнтів</div>
+    </div>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ total_services }}</div>
+        <div>Послуг</div>
+    </div>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ total_orders }}</div>
+        <div>Всього замовлень</div>
+    </div>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ completed_orders }}</div>
+        <div>Завершено</div>
+    </div>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ in_progress_orders }}</div>
+        <div>В процесі</div>
+    </div>
+    
+    <div class="stat-box">
+        <div class="stat-number">{{ scheduled_orders }}</div>
+        <div>Заплановано</div>
+    </div>
+</body>
+</html>

@@ -50,7 +50,7 @@ def client_detail(request, client_id):
     """Деталі клієнта"""
     client = next((c for c in CLIENTS if c["id"] == client_id), None)
     if client is None:
-        return HttpResponse("Клієнт не знайден", status=404)
+        return HttpResponse("Клієнт не знайдений", status=404)
 
     # Знайти замовлення клієнта
     client_orders = [o for o in ORDERS if o["client_id"] == client_id]
@@ -81,6 +81,22 @@ def service_detail(request, service_id):
     return render(request, "core/service_detail.html", context)
 
 
+def service_search(request):
+    """Пошук послуги за назвою"""
+    service_name = request.GET.get('service_name', '')
+    if service_name:
+        filtered_services = [
+            s for s in SERVICES if service_name.lower() in s["name"].lower()]
+    else:
+        filtered_services = SERVICES
+
+    context = {
+        "title": f"Результати пошуку: {service_name}" if service_name else "Послуги",
+        "services": filtered_services,
+    }
+    return render(request, "core/services_list.html", context)
+
+
 def orders_list(request):
     """Список замовлень"""
     context = {
@@ -98,6 +114,40 @@ def order_detail(request, order_id):
 
     context = {"order": order}
     return render(request, "core/order_detail.html", context)
+
+
+def orders_by_status(request, status):
+    """Замовлення за статусом"""
+    filtered_orders = [o for o in ORDERS if o["status"] == status]
+
+    context = {
+        "title": f"Замовлення зі статусом: {status}",
+        "orders": filtered_orders,
+        "status": status,
+    }
+    return render(request, "core/orders_list.html", context)
+
+
+def dashboard(request):
+    """Дашборд зі статистикою"""
+    total_clients = len(CLIENTS)
+    total_services = len(SERVICES)
+    total_orders = len(ORDERS)
+    completed_orders = len([o for o in ORDERS if o["status"] == "completed"])
+    in_progress_orders = len(
+        [o for o in ORDERS if o["status"] == "in_progress"])
+    scheduled_orders = len([o for o in ORDERS if o["status"] == "scheduled"])
+
+    context = {
+        "title": "Дашборд",
+        "total_clients": total_clients,
+        "total_services": total_services,
+        "total_orders": total_orders,
+        "completed_orders": completed_orders,
+        "in_progress_orders": in_progress_orders,
+        "scheduled_orders": scheduled_orders,
+    }
+    return render(request, "core/dashboard.html", context)
 
 
 def about(request):

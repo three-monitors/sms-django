@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/script.js' %}"></script>
+    <title>{{ title }}</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Головна</a> |
+            <a href="{% url 'clients_list' %}">Клієнти</a> |
+            <a href="{% url 'services_list' %}">Послуги</a> |
+            <a href="{% url 'orders_list' %}">Замовлення</a> |
+            <a href="{% url 'dashboard' %}">Дашборд</a> |
+            <a href="{% url 'about' %}">Про проєкт</a>
+        </nav>
+    </header>
+    
+    <h1>{{ title }}</h1>
+    <p>{{ text }}</p>
+
+    <hero>
+        {% load static %}
+        <img src="{% static 'img/banner.webp' %}" alt="Баннер">
+    </hero>
+
+    {% block content %}{% endblock %}
+</body>
+
+</html>

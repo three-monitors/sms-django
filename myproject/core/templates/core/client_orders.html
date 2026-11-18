@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        <p><strong>ID клієнта:</strong> {{ client.id }}</p>
+        <p><strong>Телефон:</strong> {{ client.phone }}</p>
+        <p><strong>Email:</strong> {{ client.email }}</p>
+        <div>
+            <a href="{% url 'client_detail' client.id %}">Разом</a>
+            <a class="status-button"
+               href="{% url 'client_orders' client.id %}"
+               {% if not status %}aria-current="page"{% endif %}>Замовлення клієнта</a>
+        </div>
+        {% if orders %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Послуга</th>
+                    <th>Статус</th>
+                    <th>Ціна, грн.</th>
+                    <th>Дата/час</th>
+                </tr>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.service_name }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.total_price|floatformat:2 }}</td>
+                        <td>{{ order.appointment_time }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Немає замовлень.</p>
+        {% endif %}
+        <div>
+            <a href="{% url 'client_detail' client.id %}">Назад до клієнта</a>
+        </div>
+    </body>
+</html>

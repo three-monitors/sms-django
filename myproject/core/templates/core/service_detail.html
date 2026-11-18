@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" with title=service.name %}</head>
+    <body>
+        <h1>{{ service.name }}</h1>
+        <p><strong>ID:</strong> {{ service.id }}</p>
+        <p><strong>Ціна:</strong> {{ service.price|floatformat:2 }} грн.</p>
+        <p><strong>Тривалість:</strong> {{ service.duration }} хв.</p>
+        <div>
+            <a href="{% url 'services_list' %}">Назад до списку</a>
+        </div>
+    </body>
+</html>

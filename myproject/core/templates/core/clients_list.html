@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        {% if clients %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Ім'я</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Дія</th>
+                </tr>
+                {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>{{ client.name }}</td>
+                        <td>{{ client.phone }}</td>
+                        <td>{{ client.email }}</td>
+                        <td>
+                            <a href="{% url 'client_detail' client.id %}">Переглянути</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Немає клієнтів.</p>
+        {% endif %}
+    </body>
+</html>

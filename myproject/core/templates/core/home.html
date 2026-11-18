@@ -1,0 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        <p>{{ text }}</p>
+        <section class="hero">
+            <img src="{% static 'img/banner.webp' %}" alt="Баннер">
+        </section>
+        {% include "core/includes/footer.html" %}
+    </body>
+</html>

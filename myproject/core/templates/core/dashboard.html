@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        <section class="dashboard-grid">
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ total_clients }}</div>
+                <div>Клієнтів</div>
+            </div>
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ total_services }}</div>
+                <div>Послуг</div>
+            </div>
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ total_orders }}</div>
+                <div>Всього замовлень</div>
+            </div>
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ completed_orders }}</div>
+                <div>Завершено</div>
+            </div>
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ in_progress_orders }}</div>
+                <div>В процесі</div>
+            </div>
+            <div class="dashboard-box">
+                <div class="dashboard-number">{{ scheduled_orders }}</div>
+                <div>Заплановано</div>
+            </div>
+        </section>
+    </body>
+</html>

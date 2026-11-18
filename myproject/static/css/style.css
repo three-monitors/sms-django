@@ -1,50 +1,329 @@
+:root {
+    /* Основні кольори */
+    --background-color: rgb(247, 246, 243);
+    --text-color: rgb(41, 44, 48);
+    --white-color: rgb(255, 255, 255);
+
+    /* Меню, кнопки та акценти */
+    --menu-color: rgb(209, 133, 127);
+    --hover-light-color: rgb(232, 170, 165);    
+    --accent: rgb(182, 64, 56);
+
+    /* Рамки карток */
+    --border: rgb(221, 222, 218);
+
+    /* Кольори таблиць */
+    --table-heading-color: rgb(238, 227, 227);
+    --table-border-color: rgb(221, 221, 221);
+    --table-hover-color: rgb(247, 238, 235);
+}
+
+/* Основні стилі */
 body {
+    margin: 0;
+    padding: 0;
+    background: var(--background-color);
+    color: var(--text-color);
     font-family: Arial, sans-serif;
-    margin: 20px;
-    padding: 0px;
 }
-nav {
-    background-color: #d1857f;
-    padding: 10px;
-    margin-bottom: 20px;
+
+h1, h4, p, main, table, div {
+    margin-left: 20px;
+    margin-right: 20px;
 }
-        
-nav a {
-    color: white;
-    margin: 0 10px;
-    text-decoration: none;
-}
-        
-table {
-    border-collapse: collapse;
-    width: 100%;
-}
-        
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-}
-        
-th {
-    background-color: #f2f2f2;
+
+div {
+    margin-block-start: 1em;
+    margin-block-end: 1em;
 }
 
 img {
+    display: block;
     width: 100%;
+    z-index: 1000;
+    width: 100%;
+    object-fit: cover;
+    margin-top: 0;
 }
 
-.stat-box {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin: 10px;
+/* Шапка та навігація */
+header {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--background-color);
+}
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 6px 0;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    background-color: var(--menu-color);
+}
+
+nav a {
+    margin: 0 10px;
+    color: var(--white-color);
+    text-decoration: none;
+}
+
+.about-photo {
+    position: relative;
+    margin: 0;
+    isolation: isolate;
+}
+
+.about-photo > img {
+    display: block;
+    width: 100%;
+    height: clamp(300px, 45vw, 600px);
+    object-fit: cover;
+}
+
+.about-photo-text {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    z-index: 2;
+
+    /* Скинути загальні відступи для div */
+    margin: 0;
+
     display: inline-block;
-    width: 150px;
-    text-align: center;
+    bottom: 20px;
+    top: auto;
+    left: auto;
+    right: 20px;
+    max-width: min(550px, calc(100% - 40px));
+    margin: 10;
+    padding: 10px 10px;
+
+    color: var(--white-color);
+    background: rgb(209 133 127 / 78%);
+    border-radius: 8px;
 }
 
-.stat-number {
-    font-size: 24px;
-    font-weight: bold;
-    color: #802227;
+.about-photo-text h1 {
+    margin: 0 0 8px;
+    font-size: clamp(24px, 3vw, 36px);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+.about-photo-text p {
+    margin: 0 0 5px;
+    max-width: 400px;
+    font-size: clamp(12px, 2vw, 24px);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.about-hero {
+    box-sizing: border-box;
+    min-height: 500px;
+    margin: 0;
+    padding: 40px 20px;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: white;
+}
+
+.about-hero h1 {
+    margin: 0 0 16px;
+    font-size: clamp(28px, 5vw, 48px);
+    line-height: 1.2;
+}
+
+.about-hero p {
+    max-width: 650px;
+    margin: 0;
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.6;
+}
+
+/* Таблиці */
+table {
+    width: calc(100% - 40px);
+    margin: 0 20px;
+    box-sizing: border-box;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 8px;
+    border: 1px solid var(--table-border-color);
+    box-sizing: border-box;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+th {
+    background-color: var(--table-heading-color);
+}
+
+tbody tr:hover {
+    background-color: var(--table-hover-color);
+}
+
+/* Панель управління */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 20px;
+    width: auto;
+    margin: 0 5px;
+    padding: 0 20px;
+}
+
+.dashboard-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+
+    min-width: 0;
+    margin: 0;
+    padding: 28px 20px;
+    box-sizing: border-box;
+
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--white-color);
+    text-align: center;
+
+    animation: reveal 500ms ease both;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.dashboard-number {
+    color: var(--accent);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+}
+
+.dashboard-box:hover {
+    border-color: var(--accent);
+    box-shadow: 0 6px 20px var(--text-color);
+}
+
+/* Кнопки та поля */
+button, input {
+    border-radius: 4px;
+    border: 1px solid;
+}
+
+button:hover {
+    background: var(--hover-light-color);
+}
+
+/* Кнопки фільтра */
+.status-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 10px;
+    padding: 9px 15px;
+    border: 1px solid var(--menu-color);
+    border-radius: 10px;
+
+    background-color: var(--white-color);
+    color: var(--menu-color);
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+
+    animation: appear 0.3s both;
+}
+
+/* Відвідане посилання зберігає початковий колір */
+.status-button:visited {
+    color: var(--menu-color);
+}
+
+/* Активний статус */
+.status-button[aria-current="page"],
+.status-button[aria-current="page"]:visited {
+    border-color: var(--menu-color);
+    background-color: var(--menu-color);
+    color: var(--white-color);
+}
+
+/* Наведення */
+.status-button:hover {
+    border-color: var(--hover-light-color);
+    background-color: var(--hover-light-color);
+    color: var(--white-color);
+    transform: translateY(-1px);
+}
+
+/* Натискання */
+.status-button:active {
+    transform: scale(0.97);
+}
+
+/* Посилання-кнопки*/
+/* Посилання поза навігацією */
+a:not(nav a) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 9px 12px;
+    border: 1px solid var(--menu-color);
+    border-radius: 10px;
+
+    color: var(--menu-color);
+    font-weight: 600;
+    text-decoration: none;
+
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+a:not(nav a):visited {
+    color: var(--menu-color);
+}
+
+a:not(nav a):hover {
+    background-color: var(--menu-color);
+    color: var(--white-color);
+}
+
+a:not(nav a):active {
+    background-color: var(--menu-color);
+    color: var(--white-color);
+    transform: scale(0.97);
+}
+
+/* Фокус клавіатурою */
+a:focus-visible,
+.status-button:focus-visible {
+    outline: 2px solid var(--menu-color);
+    outline-offset: 3px;
 }

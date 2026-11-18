@@ -1,0 +1,15 @@
+{% load static %}
+{% with current=request.resolver_match.url_name %}
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Головна</a> |
+            <a href="{% url 'clients_list' %}">Клієнти</a> |
+            <a href="{% url 'services_list' %}">Послуги</a> |
+            <a href="{% url 'orders_list' %}">Замовлення</a> |
+            <a href="{% url 'inventory_list' %}">Інвентар</a> |
+            <a href="{% url 'schedule' %}">Графік</a> |
+            <a href="{% url 'dashboard' %}">Дашборд</a> |
+            <a href="{% url 'about' %}">Про проєкт</a>
+        </nav>
+    </header>
+{% endwith %}

@@ -1,47 +1,49 @@
 <!DOCTYPE html>
 <html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>{{ title }}</title>
-</head>
-<body>
-    <nav>
-        <a href="{% url 'home' %}">Головна</a> |
-        <a href="{% url 'clients_list' %}">Клієнти</a> |
-        <a href="{% url 'services_list' %}">Послуги</a> |
-        <a href="{% url 'orders_list' %}">Замовлення</a> |
-        <a href="{% url 'dashboard' %}">Дашборд</a> |
-        <a href="{% url 'about' %}">Про проєкт</a>
-    </nav>
-
-    <h1>{{ title }}</h1>
-    
-    {% if orders %}
-        <table border="1">
-            <tr>
-                <th>ID</th>
-                <th>ID клієнта</th>
-                <th>ID послуги</th>
-                <th>Статус</th>
-                <th>Ціна</th>
-                <th>Дія</th>
-            </tr>
-            {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.client_id }}</td>
-                <td>{{ order.service_id }}</td>
-                <td>{{ order.status }}</td>
-                <td>{{ order.total_price }}</td>
-                <td><a href="{% url 'order_detail' order.id %}">Переглянути</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <p>Немає замовлень.</p>
-    {% endif %}
-</body>
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        <h4>Фільтр за статусом</h4>
+        <div>
+            <!-- За відсутності status кнопка «Усі» обрана автоматично. -->
+            <a class="status-button"
+               href="{% url 'orders_list' %}"
+               {% if not status %}aria-current="page"{% endif %}>Усі</a>
+            <a class="status-button"
+               href="{% url 'orders_by_status' 'Виконано' %}"
+               {% if status == 'Виконано' %}aria-current="page"{% endif %}>Виконано</a>
+            <a class="status-button"
+               href="{% url 'orders_by_status' 'У процесі' %}"
+               {% if status == 'У процесі' %}aria-current="page"{% endif %}>У процесі</a>
+            <a class="status-button"
+               href="{% url 'orders_by_status' 'Заплановано' %}"
+               {% if status == 'Заплановано' %}aria-current="page"{% endif %}>Заплановано</a>
+        </div>
+        <p>Знайдено записів: {{ orders|length }}</p>
+        {% if orders %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Клієнт</th>
+                    <th>Послуга</th>
+                    <th>Статус</th>
+                    <th>Ціна, грн.</th>
+                    <th>Дія</th>
+                </tr>
+                {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.client_name }}</td>
+                        <td>{{ order.service_name }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.total_price|floatformat:2 }}</td>
+                        <td><a href="{% url 'order_detail' order.id %}">Переглянути</a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Немає замовлень.</p>
+        {% endif %}
+    </body>
 </html>

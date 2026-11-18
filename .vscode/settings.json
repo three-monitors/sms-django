@@ -1,0 +1,15 @@
+{
+    "files.autoSave": "onFocusChange",
+    "editor.formatOnSave": true,
+    "djlint.enableLinting": true,
+    "djlint.maxBlankLines": 1,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "monosans.djlint"
+    },
+    "[django-html]": {
+        "editor.defaultFormatter": "monosans.djlint"
+    }
+}

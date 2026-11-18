@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <head>{% include "core/includes/head.html" %}</head>
+    <body>
+        {% include "core/includes/navbar.html" %}
+        <h1>{{ title }}</h1>
+        {% if inventory %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Кількість</th>
+                    <th>Одиниця</th>
+                    <th>Ціна, грн.</th>
+                </tr>
+                {% for item in inventory %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit }}</td>
+                        <td>{{ item.price|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Немає інвентарю.</p>
+        {% endif %}
+    </body>
+</html>

@@ -1,16 +1,12 @@
+{% extends "core/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="uk">
-    {% include "core/includes/head.html" %}
-    <body>
-        {% include "core/includes/navbar.html" %}
-        <section class="about-photo">
-            <img src="{% static 'img/picture.webp' %}" alt="Про проєкт">
-            <div class="about-photo-text">
-                <h1>{{ title }}</h1>
-                <p>{{ text }}</p>
-            </div>
-        </section>
-        {% include "core/includes/footer.html" %}
-    </body>
-</html>
+
+{% block content %}
+    <section class="about-photo">
+        <img src="{% static 'img/picture.webp' %}" alt="Про проєкт">
+        <div class="about-photo-text">
+            <h1>{{ title }}</h1>
+            <p>{{ text }}</p>
+        </div>
+    </section>
+{% endblock %}

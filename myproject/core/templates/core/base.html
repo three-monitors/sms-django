@@ -4,11 +4,11 @@
     <head>{% include "core/includes/head.html" %}</head>
     <body>
         {% include "core/includes/navbar.html" %}
-        <h1>{{ title }}</h1>
-        <p>{{ text }}</p>
+
         <main>
             {% block content %}{% endblock %}
         </main>
+
         {% include "core/includes/footer.html" %}
         <script src="{% static 'js/script.js' %}" defer></script>
         {% block extra_js %}{% endblock %}

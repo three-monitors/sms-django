@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from datetime import datetime, timedelta
 
 # Create your views here.
 # Тимчасові дані для Beauty Clinic
@@ -20,11 +21,17 @@ SERVICES = [
 
 ORDERS = [
     {"id": 1, "client_id": 1, "service_id": 1,
-        "status": "Виконано", "total_price": 850, "appointment_time": "2026-10-28 10:00"},
+        "status": "Виконано", "total_price": 850,
+        "appointment_time": "2026-10-28 10:00",
+        "created_at": datetime.now() - timedelta(days=5)},
     {"id": 2, "client_id": 2, "service_id": 2,
-        "status": "У процесі", "total_price": 400, "appointment_time": "2026-11-13 14:00"},
+        "status": "У процесі", "total_price": 400,
+        "appointment_time": "2026-11-13 14:00",
+        "created_at": datetime.now() - timedelta(days=2)},
     {"id": 3, "client_id": 1, "service_id": 3,
-        "status": "Виконано", "total_price": 600, "appointment_time": "2026-11-09 16:00"},
+        "status": "Виконано", "total_price": 600,
+        "appointment_time": "2026-11-09 16:00",
+        "created_at": datetime.now() - timedelta(days=1)},
 ]
 
 INVENTORY = [
@@ -41,18 +48,65 @@ INVENTORY = [
 
 def home(request):
     """Головна сторінка"""
+    low_stock = [item for item in INVENTORY if item["quantity"] < 3]
+
     context = {
         "title": "Beauty Clinic Management",
         "message": "Вітаємо в системі управління салоном краси!",
+        "total_clients": len(CLIENTS),
+        "total_orders": len(ORDERS),
+        "total_services": len(SERVICES),
+        "recent_orders": prepare_orders(ORDERS[:3]),
+        "low_stock": low_stock,
     }
     return render(request, "core/home.html", context)
 
 
 def clients_list(request):
     """Список клієнтів"""
+    clients_with_orders = []
+    for client in CLIENTS:
+        orders_count = len(
+            [o for o in ORDERS if o["client_id"] == client["id"]])
+        clients_with_orders.append({
+            **client,
+            "orders_count": orders_count,
+        })
+
     context = {
         "title": "Клієнти",
-        "clients": CLIENTS,
+        "clients": clients_with_orders,
+    }
+    return render(request, "core/clients_list.html", context)
+
+
+def client_search(request):
+    """Пошук клієнта за іменем, телефоном або email"""
+    search_term = request.GET.get('client_name', '').strip()
+    if search_term:
+        filtered_clients = [
+            c for c in CLIENTS
+            if search_term.lower() in c["name"].lower()
+            or search_term in c["phone"]
+            or search_term.lower() in c["email"].lower()
+        ]
+    else:
+        filtered_clients = CLIENTS
+
+    # Додамо кількість замовлень
+    clients_with_orders = []
+    for client in filtered_clients:
+        orders_count = len(
+            [o for o in ORDERS if o["client_id"] == client["id"]])
+        clients_with_orders.append({
+            **client,
+            "orders_count": orders_count,
+        })
+
+    context = {
+        "title": f"Результати пошуку: {search_term}" if search_term else "Клієнти",
+        "clients": clients_with_orders,
+        "search_term": search_term,
     }
     return render(request, "core/clients_list.html", context)
 
@@ -137,6 +191,7 @@ def service_search(request):
     context = {
         "title": f"Результати пошуку: {service_name}" if service_name else "Послуги",
         "services": filtered_services,
+        "search_term": service_name,
     }
     return render(request, "core/services_list.html", context)
 
@@ -157,7 +212,8 @@ def prepare_orders(orders):
             "service_name": (service["name"] if service else "Невідомо"),
             "status": order["status"],
             "total_price": order["total_price"],
-            "appointment_time": order.get("appointment_time", ""), })
+            "appointment_time": order.get("appointment_time", ""),
+            "created_at": order.get("created_at", ""), })
     return orders_with_names
 
 
@@ -194,6 +250,7 @@ def order_detail(request, order_id):
             "status": order["status"],
             "total_price": order["total_price"],
             "appointment_time": order.get("appointment_time", ""),
+            "created_at": order.get("created_at", ""),
         },
     }
     return render(request, "core/order_detail.html", context)

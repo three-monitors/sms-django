@@ -1,34 +1,31 @@
-<!DOCTYPE html>
-<html lang="uk">
-    <head>{% include "core/includes/head.html" with title=client.name %}</head>
-    <body>
-        {% include "core/includes/navbar.html" %}
-        <h1>Клієнт: {{ client.name }}</h1>
-        <p><strong>ID клієнта:</strong> {{ client.id }}</p>
-        <p><strong>Телефон:</strong> {{ client.phone }}</p>
-        <p><strong>Email:</strong> {{ client.email }}</p>
-        <div>
-            <a class="status-button"
-               href="{% url 'client_detail' client.id %}"
-               {% if not status %}aria-current="page"{% endif %}>Разом</a>
-            <a href="{% url 'client_orders' client.id %}">Замовлення клієнта</a>
-        </div>
-        {% if orders %}
-            <table>
-                <tr>
-                    <th>Кількість замовлень</th>
-                    <th>Сума замовлень, грн.</th>
-                </tr>
-                <tr>
-                    <td>{{ orders_count }}</td>
-                    <td>{{ orders_total|floatformat:2 }}</td>
-                </tr>
-            </table>
-        {% else %}
-            <p>Немає замовлень.</p>
-        {% endif %}
-        <div>
-            <a href="{% url 'clients_list' %}">Назад до списку клієнтів</a>
-        </div>
-    </body>
-</html>
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>Клієнт: {{ client.name }}</h1>
+    <p><strong>ID клієнта:</strong> {{ client.id }}</p>
+    <p><strong>Телефон:</strong> {{ client.phone }}</p>
+    <p><strong>Email:</strong> {{ client.email }}</p>
+    <div>
+        <a class="status-button"
+           href="{% url 'client_detail' client.id %}"
+           {% if not status %}aria-current="page"{% endif %}>Разом</a>
+        <a href="{% url 'client_orders' client.id %}">Замовлення клієнта</a>
+    </div>
+    {% if orders %}
+        <table>
+            <tr>
+                <th>Кількість замовлень</th>
+                <th>Сума замовлень, грн.</th>
+            </tr>
+            <tr>
+                <td>{{ orders_count }}</td>
+                <td>{{ orders_total|floatformat:2 }}</td>
+            </tr>
+        </table>
+    {% else %}
+        <p>Немає замовлень.</p>
+    {% endif %}
+    <div>
+        <a href="{% url 'clients_list' %}">Назад до списку клієнтів</a>
+    </div>
+{% endblock %}

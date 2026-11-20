@@ -1,15 +1,32 @@
 {% load static %}
 {% with current=request.resolver_match.url_name %}
-    <header>
-        <nav>
-            <a href="{% url 'home' %}">Головна</a> |
-            <a href="{% url 'clients_list' %}">Клієнти</a> |
-            <a href="{% url 'services_list' %}">Послуги</a> |
-            <a href="{% url 'orders_list' %}">Замовлення</a> |
-            <a href="{% url 'inventory_list' %}">Інвентар</a> |
-            <a href="{% url 'schedule' %}">Графік</a> |
-            <a href="{% url 'dashboard' %}">Дашборд</a> |
-            <a href="{% url 'about' %}">Про проєкт</a>
-        </nav>
-    </header>
+   <header>
+      <div class="header-content">
+         <div class="brand-logo">
+            <div class="logo-petal">BC</div>
+            <div class="brand-text">
+               <h1>Beauty Clinic & Aesthetic Medicine</h1>
+               <p class="tagline">Краса та здоров'я вашої шкіри</p>
+            </div>
+         </div>
+      </div>
+      <nav>
+         <a href="{% url 'home' %}"
+            {% if current == 'home' %}class="active"{% endif %}>Головна</a>
+         <a href="{% url 'clients_list' %}"
+            {% if current == 'clients_list' or current == 'client_detail' or current == 'client_orders' %}class="active"{% endif %}>Клієнти</a>
+         <a href="{% url 'services_list' %}"
+            {% if current == 'services_list' or current == 'service_detail' %}class="active"{% endif %}>Послуги</a>
+         <a href="{% url 'orders_list' %}"
+            {% if current == 'orders_list' or current == 'order_detail' or current == 'orders_by_status' %}class="active"{% endif %}>Замовлення</a>
+         <a href="{% url 'inventory_list' %}"
+            {% if current == 'inventory_list' %}class="active"{% endif %}>Інвентар</a>
+         <a href="{% url 'schedule' %}"
+            {% if current == 'schedule' %}class="active"{% endif %}>Графік</a>
+         <a href="{% url 'dashboard' %}"
+            {% if current == 'dashboard' %}class="active"{% endif %}>Дашборд</a>
+         <a href="{% url 'about' %}"
+            {% if current == 'about' %}class="active"{% endif %}>Про проєкт</a>
+      </nav>
+   </header>
 {% endwith %}

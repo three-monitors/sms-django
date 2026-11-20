@@ -1,14 +1,63 @@
+{% extends "core/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="uk">
-    <head>{% include "core/includes/head.html" %}</head>
-    <body>
-        {% include "core/includes/navbar.html" %}
-        <h1>{{ title }}</h1>
-        <p>{{ text }}</p>
-        <section class="hero">
-            <img src="{% static 'img/banner.webp' %}" alt="Баннер">
-        </section>
-        {% include "core/includes/footer.html" %}
-    </body>
-</html>
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+
+    <section class="hero">
+        <img src="{% static 'img/banner.webp' %}" alt="Баннер">
+    </section>
+
+    <section class="description">
+        <h2>Про наш салон</h2>
+        <p>Beauty Clinic & Aesthetic Medicine — це сучасний салон краси, де ви зможете насолодитися професійними процедурами для обличчя та тіла. Ми пропонуємо широкий спектр послуг: від очищення та пілінгу до масажу та інших косметичних процедур.</p>
+    </section>
+
+    <section class="statistics">
+        <div class="stat-card">
+            <h3>{{ total_clients|default:0 }}</h3>
+            <p>Клієнтів</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_orders|default:0 }}</h3>
+            <p>Замовлень</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ total_services|default:0 }}</h3>
+            <p>Послуг</p>
+        </div>
+    </section>
+
+    <h2>Останні замовлення</h2>
+    {% if recent_orders %}
+        <table>
+            <tr>
+                <th>Клієнт</th>
+                <th>Послуга</th>
+                <th>Статус</th>
+                <th>Ціна, грн.</th>
+            </tr>
+            {% for order in recent_orders %}
+                <tr>
+                    <td>{{ order.client_name }}</td>
+                    <td>{{ order.service_name }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.total_price|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Замовлень немає.</p>
+    {% endif %}
+    {% if low_stock %}
+        <div class="warning">
+            <h3>⚠️ Низькі запаси на складі:</h3>
+            <ul>
+                {% for item in low_stock %}
+                    <li>{{ item.name }} — {{ item.quantity }} {{ item.unit }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

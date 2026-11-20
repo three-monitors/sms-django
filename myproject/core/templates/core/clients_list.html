@@ -1,32 +1,46 @@
-<!DOCTYPE html>
-<html lang="uk">
-    <head>{% include "core/includes/head.html" %}</head>
-    <body>
-        {% include "core/includes/navbar.html" %}
-        <h1>{{ title }}</h1>
-        {% if clients %}
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Ім'я</th>
-                    <th>Телефон</th>
-                    <th>Email</th>
-                    <th>Дія</th>
-                </tr>
-                {% for client in clients %}
-                    <tr>
-                        <td>{{ client.id }}</td>
-                        <td>{{ client.name }}</td>
-                        <td>{{ client.phone }}</td>
-                        <td>{{ client.email }}</td>
-                        <td>
-                            <a href="{% url 'client_detail' client.id %}">Переглянути</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>Немає клієнтів.</p>
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <div class="div-form">
+        <form action="{% url 'client_search' %}" method="get">
+            <input type="text"
+                   name="client_name"
+                   placeholder="Пошук за іменем, телефоном або email..."
+                   required
+                   title="Пошук за іменем, телефоном або email...">
+            <button type="submit"
+                    class="status-button {% if search_term %}active{% endif %}">Пошук</button>
+        </form>
+        {% if search_term %}
+            <a href="{% url 'clients_list' %}" class="status-button">Скасувати пошук</a>
         {% endif %}
-    </body>
-</html>
+    </div>
+    <a href="#" class="status-button add-button">+ Додати клієнта</a>
+    {% if clients %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Ім'я</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Замовлень</th>
+                <th>Дія</th>
+            </tr>
+            {% for client in clients %}
+                <tr>
+                    <td>{{ client.id }}</td>
+                    <td>{{ client.name }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.email }}</td>
+                    <td>{{ client.orders_count }}</td>
+                    <td>
+                        <a href="{% url 'client_detail' client.id %}">Переглянути</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Немає клієнтів.</p>
+    {% endif %}
+{% endblock %}

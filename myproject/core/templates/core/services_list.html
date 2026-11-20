@@ -1,40 +1,43 @@
-<!DOCTYPE html>
-<html lang="uk">
-    <head>{% include "core/includes/head.html" %}</head>
-    <body>
-        {% include "core/includes/navbar.html" %}
-        <h1>{{ title }}</h1>
-        <!-- Форма пошуку -->
-        <div>
-            <form action="{% url 'service_search' %}" method="get">
-                <input type="text"
-                       name="service_name"
-                       placeholder="Пошук послуги..."
-                       required>
-                <button type="submit">Пошук</button>
-            </form>
-        </div>
-        {% if services %}
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Назва</th>
-                    <th>Ціна, грн.</th>
-                    <th>Тривалість, хв.</th>
-                    <th>Дія</th>
-                </tr>
-                {% for service in services %}
-                    <tr>
-                        <td>{{ service.id }}</td>
-                        <td>{{ service.name }}</td>
-                        <td>{{ service.price|floatformat:2 }}</td>
-                        <td>{{ service.duration }}</td>
-                        <td><a href="{% url 'service_detail' service.id %}">Переглянути</a></td>
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>Немає послуг.</p>
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    <div class="div-form">
+        <form action="{% url 'service_search' %}" method="get">
+            <input type="text"
+                   name="service_name"
+                   placeholder="Пошук послуги..."
+                   required
+                   title="Пошук послуги...">
+            <button type="submit"
+                    class="status-button {% if search_term %}active{% endif %}">Пошук</button>
+        </form>
+        {% if search_term %}
+            <a href="{% url 'services_list' %}" class="status-button">Показати всі</a>
         {% endif %}
-    </body>
-</html>
+    </div>
+    {% if services %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Опис</th>
+                <th>Ціна, грн.</th>
+                <th>Тривалість, хв.</th>
+                <th>Дія</th>
+            </tr>
+            {% for service in services %}
+                <tr>
+                    <td>{{ service.id }}</td>
+                    <td>{{ service.name }}</td>
+                    <td>Процедура для краси та здоров'я</td>
+                    <td>{{ service.price|floatformat:2 }}</td>
+                    <td>{{ service.duration }}</td>
+                    <td><a href="{% url 'service_detail' service.id %}">Переглянути</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Немає послуг.</p>
+    {% endif %}
+{% endblock %}

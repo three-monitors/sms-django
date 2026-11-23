@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>{{ title }}</h1>
+    <a href="{% url 'inventory_create' %}" class="status-button add-button">+ Додати товар</a>
     {% if inventory %}
         <table>
             <tr>
@@ -10,14 +11,19 @@
                 <th>Кількість</th>
                 <th>Одиниця</th>
                 <th>Ціна, грн.</th>
+                <th>Дії</th>
             </tr>
             {% for item in inventory %}
-                <tr {% if item.quantity < 3 %}style="background-color: #ffebee;"{% endif %}>
+                <tr {% if item.quantity < item.min_quantity %} class="warning-stock" {% endif %}>
                     <td>{{ item.id }}</td>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.quantity }}{% if item.quantity < 3 %} ⚠️ Низький запас{% endif %}</td>
-                    <td>{{ item.unit }}</td>
-                    <td>{{ item.price|floatformat:2 }}</td>
+                    <td>{{ item.quantity }}{% if item.quantity < item.min_quantity %} ⚠️ Низький запас{% endif %}</td>
+                    <td>{{ item.category }}</td>
+                    <td>{{ item.price_per_unit|floatformat:2 }}</td>
+                    <td>
+                        <a href="{% url 'inventory_update' item.id %}">Редагувати</a> |
+                        <a href="{% url 'inventory_delete' item.id %}">Видалити</a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

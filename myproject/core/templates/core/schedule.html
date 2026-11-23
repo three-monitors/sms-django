@@ -6,7 +6,8 @@
         <table>
             <tr>
                 <th>ID</th>
-                <th>Дата і час</th>
+                <th>Дата</th>
+                <th>Час</th>
                 <th>Клієнт</th>
                 <th>Послуга</th>
                 <th>Статус</th>
@@ -14,10 +15,23 @@
             {% for order in orders %}
                 <tr>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.appointment_time }}</td>
-                    <td>{{ order.client_name }}</td>
-                    <td>{{ order.service_name }}</td>
-                    <td>{{ order.status }}</td>
+                    <td>{{ order.date }}</td>
+                    <td>
+                        {% if order.appointment_time %}
+                            {{ order.appointment_time|time:"H:i" }} – {{ order.end_time|time:"H:i" }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ order.client.name }}</td>
+                    <td>
+                        {% for service in order.service.all %}
+                            {{ service.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Немає послуг
+                        {% endfor %}
+                    </td>
+                    <td>{{ order.get_status_display }}</td>
                 </tr>
             {% endfor %}
         </table>

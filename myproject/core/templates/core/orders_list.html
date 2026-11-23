@@ -2,43 +2,74 @@
 
 {% block content %}
     <h1>{{ title }}</h1>
+
+    <div class="div-form">
+        <form action="{% url 'orders_list' %}" method="get">
+            <input type="text"
+                   name="search"
+                   value="{{ search|default:'' }}"
+                   placeholder="Пошук за клієнтом або послугою..."
+                   title="Пошук за клієнтом або послугою...">
+            <button type="submit" class="status-button {% if search %}active{% endif %}">Пошук</button>
+        </form>
+        {% if search %}
+            <a href="{% url 'orders_list' %}" class="status-button">Скасувати пошук</a>
+        {% endif %}
+    </div>
+
     <h4>Фільтр за статусом</h4>
-    <div>
+    <div class="status-filters">
         <a class="status-button"
            href="{% url 'orders_list' %}"
+           data-status=""
            {% if not status %}aria-current="page"{% endif %}>Усі</a>
         <a class="status-button"
-           href="{% url 'orders_by_status' 'Виконано' %}"
-           {% if status == 'Виконано' %}aria-current="page"{% endif %}>Виконано</a>
+           href="{% url 'orders_by_status' 'new' %}"
+           data-status="новий"
+           {% if status == 'new' %}aria-current="page"{% endif %}>Новий</a>
         <a class="status-button"
-           href="{% url 'orders_by_status' 'У процесі' %}"
-           {% if status == 'У процесі' %}aria-current="page"{% endif %}>У процесі</a>
+           href="{% url 'orders_by_status' 'in_progress' %}"
+           data-status="у процесі"
+           {% if status == 'in_progress' %}aria-current="page"{% endif %}>У процесі</a>
         <a class="status-button"
-           href="{% url 'orders_by_status' 'Заплановано' %}"
-           {% if status == 'Заплановано' %}aria-current="page"{% endif %}>Заплановано</a>
+           href="{% url 'orders_by_status' 'completed' %}"
+           data-status="готово"
+           {% if status == 'completed' %}aria-current="page"{% endif %}>Готово</a>
     </div>
-    <p>Знайдено записів: {{ orders|length }}</p>
-    <a a href="#" class="status-button add-button">+ Нове замовлення</a>
+
+    <p>Знайдено записів: <span id="orders-count">{{ orders|length }}</span></p>
+    <a href="{% url 'order_create' %}" class="status-button add-button">+ Нове замовлення</a>
+
     {% if orders %}
         <table>
             <tr>
                 <th>ID</th>
                 <th>Клієнт</th>
-                <th>Послуга</th>
+                <th>Послуги</th>
                 <th>Статус</th>
-                <th>Сума, грн.</th>
+                <th>Ціна, грн.</th>
                 <th>Дата</th>
                 <th>Дія</th>
             </tr>
             {% for order in orders %}
                 <tr>
                     <td>{{ order.id }}</td>
-                    <td>{{ order.client_name }}</td>
-                    <td>{{ order.service_name }}</td>
-                    <td>{{ order.status }}</td>
+                    <td>{{ order.client.name }}</td>
+                    <td>
+                        {% for service in order.service.all %}
+                            {{ service.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Немає послуг
+                        {% endfor %}
+                    </td>
+                    <td>{{ order.get_status_display }}</td>
                     <td>{{ order.total_price|floatformat:2 }}</td>
-                    <td>{{ order.created_at|date:"d.m.Y" }}</td>
-                    <td><a href="{% url 'order_detail' order.id %}">Переглянути</a></td>
+                    <td>{{ order.date }}</td>
+                    <td>
+                        <a href="{% url 'order_detail' order.id %}">Переглянути</a> |
+                        <a href="{% url 'order_update' order.id %}">Редагувати</a> |
+                        <a href="{% url 'order_delete' order.id %}">Видалити</a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

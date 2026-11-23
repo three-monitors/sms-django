@@ -1,62 +1,24 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from datetime import datetime, timedelta
-
-# Create your views here.
-# Тимчасові дані для Beauty Clinic
-CLIENTS = [
-    {"id": 1, "name": "Іваненко Олег", "phone": "+380501234567",
-        "email": "ivanenko@example.com"},
-    {"id": 2, "name": "Петренко Марія", "phone": "+380509876543",
-        "email": "petrenko@example.com"},
-    {"id": 3, "name": "Коваль Андрій",
-        "phone": "+380504567890", "email": "koval@example.com"},
-]
-
-SERVICES = [
-    {"id": 1, "name": "Очищення обличчя", "price": 850, "duration": 30},
-    {"id": 2, "name": "Пілінг", "price": 400, "duration": 20},
-    {"id": 3, "name": "Масаж", "price": 600, "duration": 45},
-]
-
-ORDERS = [
-    {"id": 1, "client_id": 1, "service_id": 1,
-        "status": "Виконано", "total_price": 850,
-        "appointment_time": "2026-10-28 10:00",
-        "created_at": datetime.now() - timedelta(days=5)},
-    {"id": 2, "client_id": 2, "service_id": 2,
-        "status": "У процесі", "total_price": 400,
-        "appointment_time": "2026-11-13 14:00",
-        "created_at": datetime.now() - timedelta(days=2)},
-    {"id": 3, "client_id": 1, "service_id": 3,
-        "status": "Виконано", "total_price": 600,
-        "appointment_time": "2026-11-09 16:00",
-        "created_at": datetime.now() - timedelta(days=1)},
-]
-
-INVENTORY = [
-    {"id": 1, "name": "Крем для обличчя",
-        "quantity": 2, "unit": "шт.", "price": 450.00},
-    {"id": 2, "name": "Олія для масажу",
-        "quantity": 1, "unit": "шт.", "price": 800.00},
-    {"id": 3, "name": "Маска для обличчя",
-        "quantity": 10, "unit": "шт.", "price": 150.00},
-    {"id": 4, "name": "Міцелярна вода", "quantity": 5,
-        "unit": "шт.", "price": 200.00},
-]
+from django.contrib import messages
+from django.db import models
+from .models import Client, Service, Order, Inventory
+from .forms import ClientForm, ServiceForm, OrderForm, InventoryForm
 
 
 def home(request):
     """Головна сторінка"""
-    low_stock = [item for item in INVENTORY if item["quantity"] < 3]
+    low_stock = Inventory.objects.filter(quantity__lt=models.F("min_quantity"))
+    recent_orders = Order.objects.all()[:3]
 
     context = {
         "title": "Beauty Clinic Management",
         "message": "Вітаємо в системі управління салоном краси!",
-        "total_clients": len(CLIENTS),
-        "total_orders": len(ORDERS),
-        "total_services": len(SERVICES),
-        "recent_orders": prepare_orders(ORDERS[:3]),
+        "total_clients": Client.objects.count(),
+        "total_orders": Order.objects.count(),
+        "total_services": Service.objects.count(),
+        "recent_orders": recent_orders,
         "low_stock": low_stock,
     }
     return render(request, "core/home.html", context)
@@ -64,18 +26,11 @@ def home(request):
 
 def clients_list(request):
     """Список клієнтів"""
-    clients_with_orders = []
-    for client in CLIENTS:
-        orders_count = len(
-            [o for o in ORDERS if o["client_id"] == client["id"]])
-        clients_with_orders.append({
-            **client,
-            "orders_count": orders_count,
-        })
+    clients = Client.objects.all()
 
     context = {
         "title": "Клієнти",
-        "clients": clients_with_orders,
+        "clients": clients,
     }
     return render(request, "core/clients_list.html", context)
 
@@ -84,28 +39,19 @@ def client_search(request):
     """Пошук клієнта за іменем, телефоном або email"""
     search_term = request.GET.get('client_name', '').strip()
     if search_term:
-        filtered_clients = [
-            c for c in CLIENTS
-            if search_term.lower() in c["name"].lower()
-            or search_term in c["phone"]
-            or search_term.lower() in c["email"].lower()
-        ]
+        clients = Client.objects.filter(
+            name__icontains=search_term
+        ) | Client.objects.filter(
+            phone__icontains=search_term
+        ) | Client.objects.filter(
+            email__icontains=search_term
+        )
     else:
-        filtered_clients = CLIENTS
-
-    # Додамо кількість замовлень
-    clients_with_orders = []
-    for client in filtered_clients:
-        orders_count = len(
-            [o for o in ORDERS if o["client_id"] == client["id"]])
-        clients_with_orders.append({
-            **client,
-            "orders_count": orders_count,
-        })
+        clients = Client.objects.all()
 
     context = {
         "title": f"Результати пошуку: {search_term}" if search_term else "Клієнти",
-        "clients": clients_with_orders,
+        "clients": clients,
         "search_term": search_term,
     }
     return render(request, "core/clients_list.html", context)
@@ -113,20 +59,14 @@ def client_search(request):
 
 def client_detail(request, client_id):
     """Деталі клієнта"""
-    client = next((c for c in CLIENTS if c["id"] == client_id), None)
-    if client is None:
-        return HttpResponse("Клієнт не знайдений", status=404)
-
-    # Знайти замовлення клієнта
-    client_orders = [o for o in ORDERS if o["client_id"] == client_id]
-    # Знайти кількість замовлень
-    orders_count = len(client_orders)
-    # Знайти суму замовлень
-    orders_total = sum(float(o["total_price"]) for o in client_orders)
+    client = get_object_or_404(Client, id=client_id)
+    orders = Order.objects.filter(client=client)
+    orders_count = orders.count()
+    orders_total = sum(order.total_price for order in orders)
 
     context = {
         "client": client,
-        "orders": client_orders,
+        "orders": orders,
         "orders_count": orders_count,
         "orders_total": orders_total,
     }
@@ -134,48 +74,37 @@ def client_detail(request, client_id):
 
 
 def client_orders(request, client_id):
-    """Усі замовлення конкретного клієнта за маршрутом clients/<id>/orders/"""
-    client = next((c for c in CLIENTS if c["id"] == client_id), None)
-    if not client:
-        return render(request, "core/404.html", {"title": "Не знайдено"}, status=404)
-
-    orders_for_client = []
-    for order in ORDERS:
-        if order["client_id"] == client_id:
-            service = next(
-                (s for s in SERVICES if s["id"] == order["service_id"]), None)
-            orders_for_client.append({
-                "id": order["id"],
-                "service_name": service["name"] if service else "Невідомо",
-                "status": order["status"],
-                "total_price": order["total_price"],
-                "appointment_time": order.get("appointment_time", ""),
-            })
+    """Усі замовлення конкретного клієнта"""
+    client = get_object_or_404(Client, id=client_id)
+    orders = Order.objects.filter(client=client).order_by("-id")
 
     context = {
-        "title": f"Замовлення клієнта: {client['name']}",
+        "title": f"Замовлення клієнта: {client.name}",
         "client": client,
-        "orders": orders_for_client,
+        "orders": orders,
     }
     return render(request, "core/client_orders.html", context)
 
 
 def services_list(request):
     """Список послуг"""
+    services = Service.objects.all()
+
     context = {
         "title": "Послуги",
-        "services": SERVICES,
+        "services": services,
     }
     return render(request, "core/services_list.html", context)
 
 
 def service_detail(request, service_id):
     """Деталі послуги"""
-    service = next((s for s in SERVICES if s["id"] == service_id), None)
-    if service is None:
-        return HttpResponse("Послуга не знайдена", status=404)
+    service = get_object_or_404(Service, id=service_id)
 
-    context = {"service": service}
+    context = {
+        "service": service,
+        "duration_minutes": int(service.duration_hours * 60),
+    }
     return render(request, "core/service_detail.html", context)
 
 
@@ -183,120 +112,142 @@ def service_search(request):
     """Пошук послуги за назвою"""
     service_name = request.GET.get('service_name', '').strip()
     if service_name:
-        filtered_services = [
-            s for s in SERVICES if service_name.lower() in s["name"].lower()]
+        services = Service.objects.filter(name__icontains=service_name)
     else:
-        filtered_services = SERVICES
+        services = Service.objects.all()
 
     context = {
         "title": f"Результати пошуку: {service_name}" if service_name else "Послуги",
-        "services": filtered_services,
+        "services": services,
         "search_term": service_name,
     }
     return render(request, "core/services_list.html", context)
 
 
-def prepare_orders(orders):
-    """Додає до замовлень імена клієнтів і назви послуг"""
-    orders_with_names = []
-    for order in orders:
-        client = next(
-            (c for c in CLIENTS if c["id"] == order["client_id"]), None)
-        service = next(
-            (s for s in SERVICES if s["id"] == order["service_id"]), None)
-        orders_with_names.append({
-            "id": order["id"],
-            "client_id": order["client_id"],
-            "client_name": (client["name"] if client else "Невідомий"),
-            "service_id": order["service_id"],
-            "service_name": (service["name"] if service else "Невідомо"),
-            "status": order["status"],
-            "total_price": order["total_price"],
-            "appointment_time": order.get("appointment_time", ""),
-            "created_at": order.get("created_at", ""), })
-    return orders_with_names
-
-
 def orders_list(request):
-    """Список замовлень"""
-    orders_with_names = prepare_orders(ORDERS)
-    orders_with_names.sort(key=lambda order: order["id"])
+    """Список замовлень з пошуком та фільтрацією за статусом"""
+    orders = Order.objects.all().order_by("-date", "-appointment_time", "-id")
+
+    status = request.GET.get("status", "").strip()
+    if status:
+        orders = orders.filter(status=status)
+
+    search = request.GET.get("search", "").strip()
+    if search:
+        orders = orders.filter(client__name__icontains=search)
 
     context = {
         "title": "Замовлення",
-        "orders": orders_with_names,
+        "orders": orders,
+        "status": status,
+        "search": search,
+    }
+    return render(request, "core/orders_list.html", context)
+
+
+def orders_by_status(request, status):
+    """Замовлення за статусом"""
+    filtered_orders = Order.objects.filter(status=status)
+
+    context = {
+        "title": "Замовлення",
+        "orders": filtered_orders,
+        "status": status,
     }
     return render(request, "core/orders_list.html", context)
 
 
 def order_detail(request, order_id):
     """Деталі замовлення"""
-    order = next((o for o in ORDERS if o["id"] == order_id), None)
-    if not order:
-        return render(request, "core/404.html", {"title": "Не знайдено"}, status=404)
-
-    client = next((c for c in CLIENTS if c["id"] == order["client_id"]), None)
-    service = next(
-        (s for s in SERVICES if s["id"] == order["service_id"]), None)
+    order = get_object_or_404(Order, id=order_id)
 
     context = {
         "title": f"Замовлення #{order_id}",
-        "order": {
-            "id": order["id"],
-            "client_id": order["client_id"],
-            "client_name": client["name"] if client else "Невідомий",
-            "service_id": order["service_id"],
-            "service_name": service["name"] if service else "Невідомо",
-            "status": order["status"],
-            "total_price": order["total_price"],
-            "appointment_time": order.get("appointment_time", ""),
-            "created_at": order.get("created_at", ""),
-        },
+        "order": order,
     }
     return render(request, "core/order_detail.html", context)
 
 
-def orders_by_status(request, status):
-    filtered_orders = [o for o in ORDERS if o["status"] == status]
-    orders_with_names = prepare_orders(filtered_orders)
-
-    context = {
-        "title": "Замовлення",
-        "orders": orders_with_names,
-        "status": status,
-    }
-    return render(request, "core/orders_list.html", context)
-
-
-def inventory_list(request):
-    """Список інвентарю"""
-    context = {
-        "title": "Інвентар",
-        "inventory": INVENTORY,
-    }
-    return render(request, "core/inventory_list.html", context)
-
-
 def schedule(request):
     """Графік запису"""
-    sorted_orders = sorted(ORDERS, key=lambda order: order["appointment_time"])
-    orders_with_names = prepare_orders(sorted_orders)
+    orders = Order.objects.all().order_by("date", "appointment_time")
+
     context = {
         "title": "Графік запису",
-        "orders": orders_with_names,
+        "orders": orders,
     }
     return render(request, "core/schedule.html", context)
 
 
+def order_create(request):
+    """Створення нового замовлення"""
+    form = OrderForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Замовлення створене!")
+        return redirect("orders_list")
+
+    context = {
+        "title": "Нове замовлення",
+        "form": form,
+    }
+    return render(request, "core/order_form.html", context)
+
+
+def order_update(request, order_id):
+    """Редагування замовлення"""
+    order = get_object_or_404(Order, id=order_id)
+    form = OrderForm(request.POST or None, instance=order)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Замовлення оновлене!")
+        return redirect("order_detail", order_id=order.id)
+
+    context = {
+        "title": f"Редагувати замовлення #{order.id}",
+        "form": form,
+        "order": order,
+    }
+    return render(request, "core/order_form.html", context)
+
+
+def order_delete(request, order_id):
+    """Видалення замовлення"""
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+        order.delete()
+        messages.success(request, "✓ Замовлення видалене!")
+        return redirect("orders_list")
+
+    context = {
+        "title": "Видалення замовлення",
+        "order": order,
+    }
+    return render(request, "core/order_confirm_delete.html", context)
+
+
+def inventory_list(request):
+    """Список інвентарю"""
+    inventory = Inventory.objects.all()
+
+    context = {
+        "title": "Інвентар",
+        "inventory": inventory,
+    }
+    return render(request, "core/inventory_list.html", context)
+
+
 def dashboard(request):
     """Дашборд зі статистикою"""
-    total_clients = len(CLIENTS)
-    total_services = len(SERVICES)
-    total_orders = len(ORDERS)
-    completed_orders = len([o for o in ORDERS if o["status"] == "Виконано"])
-    in_progress_orders = len(
-        [o for o in ORDERS if o["status"] == "У процесі"])
-    scheduled_orders = len([o for o in ORDERS if o["status"] == "Заплановано"])
+    total_clients = Client.objects.count()
+    total_services = Service.objects.count()
+    total_orders = Order.objects.count()
+    completed_orders = Order.objects.filter(status="completed").count()
+    in_progress_orders = Order.objects.filter(status="in_progress").count()
+    scheduled_orders = Order.objects.filter(status="new").count()
 
     context = {
         "title": "Дашборд",
@@ -315,3 +266,162 @@ def about(request):
         "title": "Про проєкт",
         "text": "Мій проєкт - система управління Beauty Clinic на Django.",
     })
+
+
+# CREATE - Client
+def client_create(request):
+    """Створення нового клієнта"""
+    form = ClientForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Клієнт створений!")
+        return redirect("clients_list")
+
+    context = {
+        "title": "Новий клієнт",
+        "form": form,
+    }
+    return render(request, "core/client_form.html", context)
+
+
+# UPDATE - Client
+def client_update(request, client_id):
+    """Редагування клієнта"""
+    client = get_object_or_404(Client, id=client_id)
+    form = ClientForm(request.POST or None, instance=client)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Клієнт оновлений!")
+        return redirect("client_detail", client_id=client.id)
+
+    context = {
+        "title": f"Редагувати: {client.name}",
+        "form": form,
+        "client": client,
+    }
+    return render(request, "core/client_form.html", context)
+
+
+# DELETE - Client
+def client_delete(request, client_id):
+    """Видалення клієнта"""
+    client = get_object_or_404(Client, id=client_id)
+
+    if request.method == "POST":
+        client.delete()
+        messages.success(request, "✓ Клієнт видалений!")
+        return redirect("clients_list")
+
+    context = {
+        "title": "Видалення клієнта",
+        "client": client,
+    }
+    return render(request, "core/client_confirm_delete.html", context)
+
+
+# CREATE - Service
+def service_create(request):
+    """Створення нової послуги"""
+    form = ServiceForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Послуга створена!")
+        return redirect("services_list")
+
+    context = {
+        "title": "Нова послуга",
+        "form": form,
+    }
+    return render(request, "core/service_form.html", context)
+
+
+# UPDATE - Service
+def service_update(request, service_id):
+    """Редагування послуги"""
+    service = get_object_or_404(Service, id=service_id)
+    form = ServiceForm(request.POST or None, instance=service)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Послуга оновлена!")
+        return redirect("service_detail", service_id=service.id)
+
+    context = {
+        "title": f"Редагувати: {service.name}",
+        "form": form,
+        "service": service,
+    }
+    return render(request, "core/service_form.html", context)
+
+
+# DELETE - Service
+def service_delete(request, service_id):
+    """Видалення послуги"""
+    service = get_object_or_404(Service, id=service_id)
+
+    if request.method == "POST":
+        service.delete()
+        messages.success(request, "✓ Послуга видалена!")
+        return redirect("services_list")
+
+    context = {
+        "title": "Видалення послуги",
+        "service": service,
+    }
+    return render(request, "core/service_confirm_delete.html", context)
+
+
+# CREATE - Inventory
+def inventory_create(request):
+    """Створення нового товару"""
+    form = InventoryForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Товар створений!")
+        return redirect("inventory_list")
+
+    context = {
+        "title": "Новий товар",
+        "form": form,
+    }
+    return render(request, "core/inventory_form.html", context)
+
+
+# UPDATE - Inventory
+def inventory_update(request, inventory_id):
+    """Редагування товару"""
+    inventory = get_object_or_404(Inventory, id=inventory_id)
+    form = InventoryForm(request.POST or None, instance=inventory)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "✓ Товар оновлений!")
+        return redirect("inventory_list")
+
+    context = {
+        "title": f"Редагувати: {inventory.name}",
+        "form": form,
+        "inventory": inventory,
+    }
+    return render(request, "core/inventory_form.html", context)
+
+
+# DELETE - Inventory
+def inventory_delete(request, inventory_id):
+    """Видалення товару"""
+    inventory = get_object_or_404(Inventory, id=inventory_id)
+
+    if request.method == "POST":
+        inventory.delete()
+        messages.success(request, "✓ Товар видалений!")
+        return redirect("inventory_list")
+
+    context = {
+        "title": "Видалення товару",
+        "inventory": inventory,
+    }
+    return render(request, "core/inventory_confirm_delete.html", context)

@@ -2,19 +2,31 @@
 
 {% block content %}
     <h1>Замовлення #{{ order.id }}</h1>
-    <p><strong>ID клієнта:</strong> {{ order.client_id }}</p>
-    <p><strong>Клієнт:</strong> {{ order.client_name }}</p>
-    <p><strong>ID послуги:</strong> {{ order.service_id }}</p>
-    <p><strong>Послуга:</strong> {{ order.service_name }}</p>
-    <p><strong>Статус:</strong> {{ order.status }}</p>
-    <p><strong>Сума, грн.:</strong> {{ order.total_price|floatformat:2 }}</p>
-    <p><strong>Дата створення:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-    <p><strong>Дата запису:</strong> {{ order.appointment_time }}</p>
+    <p><strong>Клієнт:</strong> {{ order.client.name }}</p>
+    <p>
+        <strong>Послуги:</strong>
+        {% for service in order.service.all %}
+            {{ service.name }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            Немає послуг
+        {% endfor %}
+    </p>
+    <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+    <p><strong>Дата:</strong> {{ order.date|date:"d.m.Y" }}</p>
+    <p>
+        <strong>Час запису:</strong>
+        {% if order.appointment_time %}
+            {{ order.appointment_time|time:"H:i" }} – {{ order.end_time|time:"H:i" }}
+        {% else %}
+            Не вказано
+        {% endif %}
+    </p>
+    <p><strong>Примітки:</strong> {{ order.description|default:"-" }}</p>
+    <p><strong>Ціна, грн.:</strong> {{ order.total_price|floatformat:2 }}</p>
+
     <div>
-        <a href="#" class="status-button">Редагувати</a>
-        <a href="#" class="status-button">Видалити</a>
-    </div>
-    <div>
-        <a href="{% url 'orders_list' %}">Назад до списку</a>
+        <a href="{% url 'order_update' order.id %}" class="status-button">Редагувати</a>
+        <a href="{% url 'order_delete' order.id %}" class="status-button red">Видалити</a>
+        <a href="{% url 'orders_list' %}" class="status-button">Назад до списку</a>
     </div>
 {% endblock %}

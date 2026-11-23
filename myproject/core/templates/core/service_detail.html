@@ -4,8 +4,12 @@
     <h1>{{ service.name }}</h1>
     <p><strong>ID:</strong> {{ service.id }}</p>
     <p><strong>Ціна:</strong> {{ service.price|floatformat:2 }} грн.</p>
-    <p><strong>Тривалість:</strong> {{ service.duration }} хв.</p>
+    <p><strong>Тривалість:</strong> {{ duration_minutes }} хв.</p>
+    <p><strong>Опис:</strong> {{ service.description|default:"Немає опису" }}</p>
     <div>
+        <a href="{% url 'service_update' service.id %}" class="status-button">Редагувати</a>
+        <a href="{% url 'service_delete' service.id %}"
+           class="status-button red">Видалити</a>
         <a href="{% url 'services_list' %}">Назад до списку</a>
     </div>
 {% endblock %}

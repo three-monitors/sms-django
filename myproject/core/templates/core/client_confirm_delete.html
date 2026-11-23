@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    <div class="warning">
+        <p>Ви впевнені, що хочете видалити "<strong>{{ client.name }}</strong>"?</p>
+        <p>Це не можна буде скасувати!</p>
+    </div>
+
+    <div class="div-form">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="status-button red">Так, видалити</button>
+            <a href="{% url 'client_detail' client.id %}" class="status-button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}

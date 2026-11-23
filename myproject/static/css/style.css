@@ -8,6 +8,8 @@
     --menu-color: rgb(209, 133, 127);
     --hover-light-color: rgb(232, 170, 165);    
     --accent: rgb(182, 64, 56);
+    --red-color: rgb(220, 38, 38);
+    --warning-color: rgb(255, 235, 238);
 
     /* Рамки карток */
     --border: rgb(221, 222, 218);
@@ -60,10 +62,108 @@ header {
     opacity: 0.9;
 }
 
+.hero {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 155px);
+    min-height: 440px;
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--table-heading-color);
+}
+
+.hero > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    display: block;
+    margin: 0;
+}
+
+.hero-text {
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+
+    max-width: 20%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.hero-text h1 {
+    margin: 0 0 8px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(22px, 2.3vw, 36px);
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--accent);
+}
+
+.hero-text p {
+    margin: 0;
+    font-size: clamp(14px, 1.15vw, 18px);
+    line-height: 1.35;
+    color: var(--text-color);
+}
+
+/* Адаптація для планшетів і телефонів */
+@media (max-width: 850px) {
+    .hero {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: 0;
+    }
+
+    .hero-text {
+        order: -1;
+        position: static;
+        transform: none;
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 20px;
+        background-color: var(--table-heading-color);
+    }
+
+    .hero > img {
+        width: 100%;
+        height: clamp(340px, 60vh, 520px);
+        max-height: none;
+        object-fit: cover;
+        object-position: right center;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-text {
+        padding: 8px 16px;
+    }
+
+    .hero > img {
+        width: 135%;
+        max-width: none;
+        max-height: none;
+        height: auto;
+        margin-left: -35%;
+    }
+}
+
 main {
     flex: 1;
     margin: 0;
     padding: 0;
+    display: block;
+}
+
+main:has(.about-photo),
+main:has(.hero) {
+    display: flex;
+    flex-direction: column;
 }
 
 main h1 {
@@ -73,6 +173,17 @@ main h1 {
 
 footer {
     margin-top: auto;
+    background-color: var(--background-color);
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+}
+
+footer p {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 h1, h2, h3, h4, p, table, div {
@@ -87,8 +198,6 @@ div {
 
 img {
     display: block;
-    width: 100%;
-    z-index: 1000;
     width: 100%;
     object-fit: cover;
     margin-top: 0;
@@ -173,36 +282,32 @@ nav a.active {
     position: relative;
     margin: 0;
     isolation: isolate;
+    flex: 1;
+    min-height: 280px;
+    overflow: hidden;
 }
 
 .about-photo > img {
-    display: block;
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: clamp(300px, 45vw, 600px);
+    height: 100%;
     object-fit: cover;
+    z-index: 1;
 }
 
 .about-photo-text {
     position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
+    bottom: 20px;
+    right: 20px;
     z-index: 2;
 
-    /* Скинути загальні відступи для div */
-    margin: 0;
-
-    display: inline-block;
-    bottom: 20px;
-    top: auto;
-    left: auto;
-    right: 20px;
     max-width: min(550px, calc(100% - 40px));
-    margin: 10;
-    padding: 10px 10px;
+    margin: 0;
+    padding: 14px 18px;
 
     color: var(--white-color);
-    background: rgb(209 133 127 / 78%);
+    background: rgb(209 133 127 / 85%);
     border-radius: 8px;
 }
 
@@ -322,9 +427,10 @@ tbody tr:hover {
 /* Кнопки та поля */
 .div-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     align-items: center;
-    flex-wrap: wrap;
+    margin-left: 20px;
 }
 
 form {
@@ -371,6 +477,7 @@ button:visited {
 
 .add-button {
     margin-left: 20px;
+    align-self: flex-start;
 }
 
 .description {
@@ -447,6 +554,10 @@ button:visited {
     transform: scale(0.97);
 }
 
+.red:hover {
+    background-color: var(--red-color);
+}
+
 /* Посилання-кнопки*/
 /* Посилання поза навігацією */
 a:not(nav a) {
@@ -519,16 +630,20 @@ a:focus-visible,
 }
 
 .warning {
-    background: #ffebee;
+    background: var(--warning-color);
     padding: 15px;
     margin: 20px;
     border-radius: 8px;
-    border: 1px solid #ef9a9a;
+    border: 1px solid var(--menu-color);
 }
 
 .warning h3 {
     margin: 0 0 10px 0;
-    color: #c62828;
+    color: var(--accent);
+}
+
+.warning-stock {
+    background: var(--warning-color);
 }
 
 ul {
@@ -566,4 +681,36 @@ ul {
     form button {
         width: 100%;
     }
+}
+
+/* Форми */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.errorlist {
+    color: var(--red-color);
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.clear {
+    clear: both;
+    width: 100%;
+    display: block;
+    margin-top: 20px;
 }

@@ -1,0 +1,17 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    <div class="warning">
+        <p>Ви впевнені, що хочете видалити "<strong>{{ service.name }}</strong>"?</p>
+    </div>
+
+    <div class="div-form">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="status-button red">Так, видалити</button>
+            <a href="{% url 'service_detail' service.id %}" class="status-button">Скасувати</a>
+        </form>
+    </div>
+{% endblock %}

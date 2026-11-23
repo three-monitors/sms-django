@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from django.db import models
 
 
@@ -55,6 +56,21 @@ class Service(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
+    def duration_minutes(self):
+        return round(self.duration_hours * 60)
+
+    @property
+    def duration_formatted(self):
+        total_mins = self.duration_minutes
+        hours = total_mins // 60
+        mins = total_mins % 60
+        if hours and mins:
+            return f"{hours} год. {mins} хв."
+        elif hours:
+            return f"{hours} год."
+        return f"{mins} хв."
+
     class Meta:
         verbose_name = "Послуга"
         verbose_name_plural = "Послуги"
@@ -85,6 +101,7 @@ class Order(models.Model):
         default="new"
     )
     date = models.DateField()
+    appointment_time = models.TimeField(null=True, blank=True)
     description = models.TextField(blank=True)
     total_price = models.DecimalField(
         max_digits=10,
@@ -97,7 +114,17 @@ class Order(models.Model):
     class Meta:
         verbose_name = "Замовлення"
         verbose_name_plural = "Замовлення"
-        ordering = ["-date"]
+        ordering = ["-date", "-appointment_time"]
+
+    @property
+    def end_time(self):
+        """Автоматичний розрахунок часу завершення процедури"""
+        if not self.appointment_time:
+            return None
+        total_minutes = sum(s.duration_minutes for s in self.service.all())
+        start_dt = datetime.combine(self.date, self.appointment_time)
+        end_dt = start_dt + timedelta(minutes=total_minutes)
+        return end_dt.time()
 
     def __str__(self):
         return f"Замовлення #{self.id} - {self.client.name}"
@@ -119,7 +146,7 @@ class Inventory(models.Model):
         ordering = ["-quantity"]
 
     def __str__(self):
-        return f"{self.name} ({self.quantity} шт)"
+        return f"{self.name} ({self.quantity} шт.)"
 
     def is_low_stock(self):
         """Чи низький залишок"""

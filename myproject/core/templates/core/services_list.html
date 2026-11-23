@@ -16,6 +16,7 @@
             <a href="{% url 'services_list' %}" class="status-button">Показати всі</a>
         {% endif %}
     </div>
+    <a href="{% url 'service_create' %}" class="status-button add-button">+ Додати послугу</a>
     {% if services %}
         <table>
             <tr>
@@ -24,16 +25,20 @@
                 <th>Опис</th>
                 <th>Ціна, грн.</th>
                 <th>Тривалість, хв.</th>
-                <th>Дія</th>
+                <th>Дії</th>
             </tr>
             {% for service in services %}
                 <tr>
                     <td>{{ service.id }}</td>
                     <td>{{ service.name }}</td>
-                    <td>Процедура для краси та здоров'я</td>
+                    <td>{{ service.description|default:"Немає опису" }}</td>
                     <td>{{ service.price|floatformat:2 }}</td>
-                    <td>{{ service.duration }}</td>
-                    <td><a href="{% url 'service_detail' service.id %}">Переглянути</a></td>
+                    <td>{{ service.duration_formatted }}</td>
+                    <td>
+                        <a href="{% url 'service_detail' service.id %}">Переглянути</a> |
+                        <a href="{% url 'service_update' service.id %}">Редагувати</a> |
+                        <a href="{% url 'service_delete' service.id %}">Видалити</a>
+                    </td>
                 </tr>
             {% endfor %}
         </table>

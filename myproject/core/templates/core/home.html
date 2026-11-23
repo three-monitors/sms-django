@@ -2,10 +2,12 @@
 {% load static %}
 
 {% block content %}
-    <h1>{{ title }}</h1>
-    <p>{{ message }}</p>
 
     <section class="hero">
+        <div class="hero-text">
+            <h1>{{ title }}</h1>
+            <p>{{ message }}</p>
+        </div>
         <img src="{% static 'img/banner.webp' %}" alt="Баннер">
     </section>
 
@@ -29,20 +31,26 @@
         </div>
     </section>
 
-    <h2>Останні замовлення</h2>
     {% if recent_orders %}
+        <h2>Останні замовлення</h2>
         <table>
             <tr>
                 <th>Клієнт</th>
                 <th>Послуга</th>
                 <th>Статус</th>
-                <th>Ціна, грн.</th>
+                <th>Сума, грн.</th>
             </tr>
             {% for order in recent_orders %}
                 <tr>
-                    <td>{{ order.client_name }}</td>
-                    <td>{{ order.service_name }}</td>
-                    <td>{{ order.status }}</td>
+                    <td>{{ order.client.name }}</td>
+                    <td>
+                        {% for service in order.service.all %}
+                            {{ service.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Немає послуг
+                        {% endfor %}
+                    </td>
+                    <td>{{ order.get_status_display }}</td>
                     <td>{{ order.total_price|floatformat:2 }}</td>
                 </tr>
             {% endfor %}

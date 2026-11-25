@@ -203,6 +203,13 @@ img {
     margin-top: 0;
 }
 
+.img-services {
+    max-width: 400px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+}
+
 /* Логотип */
 .brand-logo {
     display: inline-flex;
@@ -284,6 +291,8 @@ nav a.active {
     font-size: 14px;
     text-align: right;
     margin-right: 20px;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .about-photo {

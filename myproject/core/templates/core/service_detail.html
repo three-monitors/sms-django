@@ -1,7 +1,13 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block content %}
     <h1>{{ service.name }}</h1>
+    {% if service.image_path %}
+        <img src="{% static 'img/'|add:service.image_path %}"
+             alt="{{ service.name }}"
+             class="img-services">
+    {% endif %}
     <p><strong>ID:</strong> {{ service.id }}</p>
     <p><strong>Ціна:</strong> {{ service.price|floatformat:2 }} грн.</p>
     <p><strong>Тривалість:</strong> {{ duration_minutes }} хв.</p>

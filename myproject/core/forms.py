@@ -88,12 +88,14 @@ class ServiceForm(forms.ModelForm):
 
     class Meta:
         model = Service
-        fields = ["name", "description", "price", "duration", "is_active"]
+        fields = ["name", "description", "price",
+                  "duration", "is_active", "image_path"]
         labels = {
             "name": "Назва послуги",
             "description": "Опис послуги",
             "price": "Ціна, грн.",
             "is_active": "Активна послуга",
+            "image_path": "Шлях до файлу, наприклад service_01.jpg"
         }
         widgets = {
             "name": forms.TextInput(attrs={
@@ -112,6 +114,10 @@ class ServiceForm(forms.ModelForm):
             }),
             "is_active": forms.CheckboxInput(attrs={
                 "class": "form-check-input",
+            }),
+            "image_path": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "service_01.png",
             }),
         }
 

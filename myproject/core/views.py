@@ -2,9 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from datetime import datetime, timedelta
 from django.contrib import messages
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login
 from django.db import models
 from .models import Client, Service, Order, Inventory
 from .forms import ClientForm, ServiceForm, OrderForm, InventoryForm
+from django.contrib.auth import logout as auth_logout
 
 
 def home(request):
@@ -179,12 +183,16 @@ def schedule(request):
     return render(request, "core/schedule.html", context)
 
 
+@login_required
 def order_create(request):
     """Створення нового замовлення"""
     form = OrderForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        form.save()
+        order = form.save(commit=False)
+        order.created_by = request.user
+        order.save()
+        form.save_m2m()  # для many-to-many
         messages.success(request, "✓ Замовлення створене!")
         return redirect("orders_list")
 
@@ -195,9 +203,15 @@ def order_create(request):
     return render(request, "core/order_form.html", context)
 
 
+@login_required
 def order_update(request, order_id):
     """Редагування замовлення"""
     order = get_object_or_404(Order, id=order_id)
+
+    # Перевірка: тільки автор або суперкористувач може редагувати
+    if order.created_by != request.user and not request.user.is_superuser:
+        return HttpResponse("Доступ заборонено", status=403)
+
     form = OrderForm(request.POST or None, instance=order)
 
     if request.method == "POST" and form.is_valid():
@@ -425,3 +439,56 @@ def inventory_delete(request, inventory_id):
         "inventory": inventory,
     }
     return render(request, "core/inventory_confirm_delete.html", context)
+
+
+def register(request):
+    """Реєстрація користувача"""
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get("username")
+            user = authenticate(username=username,
+                                password=form.cleaned_data.get("password1"))
+            login(request, user)
+            messages.success(request, "✓ Реєстрація успішна!")
+            return redirect("home")
+    else:
+        form = UserCreationForm()
+
+    context = {
+        "title": "Реєстрація",
+        "form": form,
+    }
+    return render(request, "registration/register.html", context)
+
+
+@login_required
+def profile(request):
+    """Профіль користувача"""
+    context = {
+        "title": "Профіль",
+        "user": request.user,
+    }
+    return render(request, "registration/profile.html", context)
+
+
+@login_required
+def my_orders(request):
+    """Мої замовлення"""
+    orders = Order.objects.filter(created_by=request.user).order_by(
+        "-date", "-appointment_time")
+
+    context = {
+        "title": "Мої замовлення",
+        "orders": orders,
+    }
+    return render(request, "registration/my_orders.html", context)
+
+
+def logout_view(request):
+    """Вихід із системи"""
+    if request.method == "POST":
+        auth_logout(request)
+        return redirect("home")
+    return render(request, "registration/logout_confirm.html")

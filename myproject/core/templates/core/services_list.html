@@ -4,6 +4,7 @@
     <h1>{{ title }}</h1>
     <div class="div-form">
         <form action="{% url 'service_search' %}" method="get">
+            {% csrf_token %}
             <input type="text"
                    name="service_name"
                    placeholder="Пошук послуги..."

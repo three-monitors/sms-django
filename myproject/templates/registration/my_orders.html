@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    {% if orders %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Клієнт</th>
+                <th>Послуги</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Час</th>
+                <th>Ціна, грн.</th>
+            </tr>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.client.name }}</td>
+                    <td>
+                        {% for service in order.service.all %}
+                            {{ service.name }}{% if not forloop.last %}, {% endif %}
+                        {% empty %}
+                            Немає послуг
+                        {% endfor %}
+                    </td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>{{ order.date }}</td>
+                    <td>{{ order.appointment_time|date:"H:i"|default:"-" }}</td>
+                    <td>{{ order.total_price|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Немає замовлень.</p>
+    {% endif %}
+
+    <div class="clear">
+        <a href="{% url 'profile' %}" class="status-button">Назад до профілю</a>
+    </div>
+{% endblock %}

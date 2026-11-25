@@ -7,7 +7,9 @@
     <p><strong>Email:</strong> {{ client.email }}</p>
     <div>
         <a href="{% url 'client_detail' client.id %}">Разом</a>
-        <a class="status-button">Замовлення клієнта</a>
+        <a class="status-button"
+           href="{% url 'client_orders' client.id %}"
+           {% if not status %}aria-current="page"{% endif %}>Замовлення клієнта</a>
     </div>
     {% if orders %}
         <table>

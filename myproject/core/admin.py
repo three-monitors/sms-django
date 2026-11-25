@@ -19,7 +19,8 @@ class PatientProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    list_display = ["name", "price", "duration_hours", "is_active"]
+    list_display = ["name", "price",
+                    "duration_hours", "is_active", "image_path"]
     search_fields = ["name"]
     list_filter = ["is_active"]
     ordering = ["name"]

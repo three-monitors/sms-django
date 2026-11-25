@@ -54,6 +54,8 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration_hours = models.FloatField()
     is_active = models.BooleanField(default=True)
+    image_path = models.CharField(
+        max_length=255, blank=True, help_text="Шлях до фото в static/img, наприклад: service_01.jpg")
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

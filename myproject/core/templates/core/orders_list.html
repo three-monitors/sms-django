@@ -5,6 +5,7 @@
 
     <div class="div-form">
         <form action="{% url 'orders_list' %}" method="get">
+            {% csrf_token %}
             <input type="text"
                    name="search"
                    value="{{ search|default:'' }}"

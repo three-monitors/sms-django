@@ -1,0 +1,14 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    <p><strong>Логін:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email|default:"Не вказано" }}</p>
+    <p><strong>Дата реєстрації:</strong> {{ user.date_joined|date:"d.m.Y H:i" }}</p>
+
+    <div class="clear">
+        <a href="{% url 'my_orders' %}" class="status-button">Мої замовлення</a>
+        <a href="{% url 'home' %}" class="status-button">На головну</a>
+    </div>
+{% endblock %}

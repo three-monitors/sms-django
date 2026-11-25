@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="div-form">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="errorlist">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="clear">
+            <button type="submit" class="status-button">Зареєструватися</button>
+            <a href="{% url 'login' %}" class="status-button">Увійти</a>
+        </div>
+    </form>
+{% endblock %}

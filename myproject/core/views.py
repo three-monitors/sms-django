@@ -9,6 +9,10 @@ from django.db import models
 from .models import Client, Service, Order, Inventory
 from .forms import ClientForm, ServiceForm, OrderForm, InventoryForm
 from django.contrib.auth import logout as auth_logout
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import OrderSerializer
 
 
 def home(request):
@@ -492,3 +496,38 @@ def logout_view(request):
         auth_logout(request)
         return redirect("home")
     return render(request, "registration/logout_confirm.html")
+
+
+class OrderListAPI(APIView):
+    """API для списку замовлень"""
+    serializer_class = OrderSerializer
+
+    def get(self, request):
+        """Отримати всі замовлення"""
+        orders = Order.objects.all()
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        """Створити нове замовлення"""
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StatisticsAPI(APIView):
+    """API для статистики"""
+
+    def get(self, request):
+        """Отримати статистику"""
+        from .models import Client, Service, Inventory
+
+        data = {
+            "clients": Client.objects.count(),
+            "services": Service.objects.count(),
+            "orders": Order.objects.count(),
+            "inventory": Inventory.objects.count(),
+        }
+        return Response(data)

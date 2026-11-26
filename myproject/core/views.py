@@ -10,9 +10,12 @@ from .models import Client, Service, Order, Inventory
 from .forms import ClientForm, ServiceForm, OrderForm, InventoryForm
 from django.contrib.auth import logout as auth_logout
 from rest_framework.views import APIView
+from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import OrderSerializer
+from .serializers import ClientSerializer, ServiceSerializer, OrderSerializer, InventorySerializer
+from django_filters import rest_framework as filters
 
 
 def home(request):
@@ -531,3 +534,61 @@ class StatisticsAPI(APIView):
             "inventory": Inventory.objects.count(),
         }
         return Response(data)
+
+
+class ClientViewSet(viewsets.ModelViewSet):
+    """ViewSet для клієнтів"""
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    """ViewSet для послуг"""
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
+
+
+class InventoryViewSet(viewsets.ModelViewSet):
+    """ViewSet для інвентарю"""
+    queryset = Inventory.objects.all()
+    serializer_class = InventorySerializer
+
+
+class OrderFilter(filters.FilterSet):
+    """Фільтр для замовлень"""
+    status = filters.CharFilter(field_name='status')
+    date = filters.DateFilter(field_name='date')
+    date_from = filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_to = filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    class Meta:
+        model = Order
+        fields = ['status', 'date']
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    """ViewSet для замовлень"""
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    filterset_class = OrderFilter
+
+    def get_queryset(self):
+        """Фільтрація за статусом"""
+        queryset = Order.objects.all()
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        return queryset
+
+    def perform_create(self, serializer):
+        """Автоматично зберігає автора"""
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        """Власний endpoint: завершити замовлення"""
+        order = self.get_object()
+        order.status = 'completed'
+        order.save()
+        serializer = self.get_serializer(order)
+        return Response(serializer.data)

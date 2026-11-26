@@ -5,7 +5,7 @@
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
-pip install django
+pip install -r requirements.txt
 cd myproject
 python manage.py runserver
 ```
@@ -18,7 +18,12 @@ python manage.py runserver
 - Деталі послуги
 - Список замовлень
 - Деталі замовлення
+- Інвентар
+- Графік запису
+- Дашборд
 - Сторінка "Про проєкт"
+- Автентифікація користувачів
+- REST API
 
 ## Сторінки
 
@@ -43,8 +48,88 @@ python manage.py runserver
 ### *Деталі замовлення* (/orders/id/)
 Показує деталі окремого замовлення.
 
+### Інвентар (/inventory/)
+Показує список матеріалів на складі.
+
+### Графік (/schedule/)
+Показує графік запису клієнтів.
+
+### Дашборд (/dashboard/)
+Показує статистику проєкту.
+
 ### Про проєкт (/about/)
 Показує заголовок "Про проєкт" та інформацію про Django реалізацію Beauty Clinic.
+
+## REST API
+REST API доступен за адресою: http://127.0.0.1:8000/api/
+
+### Доступні endpoints
+ 
+#### Клієнти
+- GET /api/clients/ — список клієнтів
+- POST /api/clients/ — створення клієнта
+- GET /api/clients/{id}/ — деталі клієнта
+- PUT /api/clients/{id}/ — повне оновлення
+- PATCH /api/clients/{id}/ — часткове оновлення
+- DELETE /api/clients/{id}/ — видалення
+ 
+#### Послуги
+- GET /api/services/ — список послуг
+- POST /api/services/ — створення послуги
+- GET /api/services/{id}/ — деталі послуги
+- PUT /api/services/{id}/ — повне оновлення
+- PATCH /api/services/{id}/ — часткове оновлення
+- DELETE /api/services/{id}/ — видалення
+ 
+#### Замовлення
+- GET /api/orders/ — список замовлень
+- POST /api/orders/ — створення замовлення
+- GET /api/orders/{id}/ — деталі замовлення
+- PUT /api/orders/{id}/ — повне оновлення
+- PATCH /api/orders/{id}/ — часткове оновлення
+- DELETE /api/orders/{id}/ — видалення
+- GET /api/orders/?status=completed — фільтрація за статусом
+- POST /api/orders/{id}/complete/ — завершити замовлення (власний endpoint)
+ 
+#### Інвентар
+- GET /api/inventory/ — список інвентарю
+- POST /api/inventory/ — створення запису
+- GET /api/inventory/{id}/ — деталі
+- PUT /api/inventory/{id}/ — повне оновлення
+- PATCH /api/inventory/{id}/ — часткове оновлення
+- DELETE /api/inventory/{id}/ — видалення
+ 
+#### Статистика
+- GET /api/statistics/ — статистика проєкту
+
+### Документація API
+Swagger UI доступний за адресою: http://127.0.0.1:8000/api/docs/
+
+### Приклади запитів
+ 
+#### Створення клієнта (POST)
+POST /api/clients/
+```json
+{
+    "name": "Петренко Марія",
+    "email": "petrenko@example.com",
+    "phone": "+380509876543"
+}
+```
+
+#### Фільтрація замовлень (GET)
+GET /api/orders/?status=completed
+
+#### Завершення замовлення (POST)
+POST /api/orders/1/complete/
+
+#### Часткове оновлення (PATCH)
+PATCH /api/orders/1/
+```json
+{
+    "status": "in_progress"
+}
+```
 
 ## Автентифікація
 
@@ -80,3 +165,10 @@ python manage.py runserver
 ### Захист функціоналу
 - Створення замовлень доступно тільки авторизованим користувачам
 - Редагування замовлень доступно тільки автору або суперкористувачу
+
+
+## Крок 2: Створіть requirements.txt
+ 
+```bash
+cd D:\elearning\sms-django
+pip freeze > requirements.txt

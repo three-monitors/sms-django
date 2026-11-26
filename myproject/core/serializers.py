@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Client, Service, Order
+from .models import Client, Service, Order, Inventory
 
 
 class ClientSerializer(serializers.ModelSerializer):
@@ -7,7 +7,8 @@ class ClientSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
-        fields = ["id", "name", "email", "phone"]
+        fields = ["id", "name", "email", "phone",
+                  "date_of_birth", "skin_type", "created_at"]
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -15,7 +16,17 @@ class ServiceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Service
-        fields = ["id", "name", "price", "duration_hours"]
+        fields = ["id", "name", "description", "price",
+                  "duration_hours", "is_active", "image_path"]
+
+
+class InventorySerializer(serializers.ModelSerializer):
+    """Серіалізатор для інвентарю"""
+
+    class Meta:
+        model = Inventory
+        fields = ["id", "name", "description", "quantity",
+                  "min_quantity", "price_per_unit", "category"]
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -26,4 +37,4 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ["id", "client", "services", "status", "date",
-                  "appointment_time", "total_price", "created_at"]
+                  "appointment_time", "description", "total_price", "created_at"]

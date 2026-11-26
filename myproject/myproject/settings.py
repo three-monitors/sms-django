@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # Сторонні застосунки
     "rest_framework",  # додано пакет Django REST Framework
     "drf_spectacular",  # додано пакет для OpenAPI-документації
+    "django_filters",  # додано пакет django_filters
 ]
 
 MIDDLEWARE = [
@@ -145,6 +146,7 @@ LOGOUT_REDIRECT_URL = "home"
 # Налаштування Django REST Framework та документації API
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
 }
 
 SPECTACULAR_SETTINGS = {

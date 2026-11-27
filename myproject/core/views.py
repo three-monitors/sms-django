@@ -8,12 +8,14 @@ from django.contrib.auth import authenticate, login
 from django.db import models
 from .models import Client, Service, Order, Inventory
 from .forms import ClientForm, ServiceForm, OrderForm, InventoryForm
+from .permissions import IsStaffOrAdmin, IsOwnerOrReadOnly
 from django.contrib.auth import logout as auth_logout
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from .serializers import ClientSerializer, ServiceSerializer, OrderSerializer, InventorySerializer
 from django_filters import rest_framework as filters
 
@@ -540,18 +542,21 @@ class ClientViewSet(viewsets.ModelViewSet):
     """ViewSet для клієнтів"""
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
+    permission_classes = [IsAuthenticated, IsStaffOrAdmin]
 
 
 class ServiceViewSet(viewsets.ModelViewSet):
     """ViewSet для послуг"""
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+    permission_classes = [IsAuthenticated, IsStaffOrAdmin]
 
 
 class InventoryViewSet(viewsets.ModelViewSet):
     """ViewSet для інвентарю"""
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
+    permission_classes = [IsAuthenticated, IsStaffOrAdmin]
 
 
 class OrderFilter(filters.FilterSet):
@@ -571,6 +576,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filterset_class = OrderFilter
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         """Фільтрація за статусом"""

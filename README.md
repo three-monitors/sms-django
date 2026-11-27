@@ -63,41 +63,41 @@ python manage.py runserver
 ## REST API
 REST API доступен за адресою: http://127.0.0.1:8000/api/
 
-### Доступні endpoints
+### API endpoints
  
 #### Клієнти
-- GET /api/clients/ — список клієнтів
-- POST /api/clients/ — створення клієнта
+- GET /api/clients/ — список клієнтів (авторизовані)
+- POST /api/clients/ — створення клієнта (персонал)
 - GET /api/clients/{id}/ — деталі клієнта
-- PUT /api/clients/{id}/ — повне оновлення
-- PATCH /api/clients/{id}/ — часткове оновлення
-- DELETE /api/clients/{id}/ — видалення
+- PUT /api/clients/{id}/ — повне оновлення (персонал)
+- PATCH /api/clients/{id}/ — часткове оновлення (персонал)
+- DELETE /api/clients/{id}/ — видалення (персонал)
  
 #### Послуги
-- GET /api/services/ — список послуг
-- POST /api/services/ — створення послуги
+- GET /api/services/ — список послуг (авторизовані)
+- POST /api/services/ — створення послуги (персонал)
 - GET /api/services/{id}/ — деталі послуги
-- PUT /api/services/{id}/ — повне оновлення
-- PATCH /api/services/{id}/ — часткове оновлення
-- DELETE /api/services/{id}/ — видалення
+- PUT /api/services/{id}/ — повне оновлення (персонал)
+- PATCH /api/services/{id}/ — часткове оновлення (персонал)
+- DELETE /api/services/{id}/ — видалення (персонал)
  
 #### Замовлення
-- GET /api/orders/ — список замовлень
-- POST /api/orders/ — створення замовлення
+- GET /api/orders/ — список замовлень (авторизовані)
+- POST /api/orders/ — створення замовлення (авторизовані)
 - GET /api/orders/{id}/ — деталі замовлення
-- PUT /api/orders/{id}/ — повне оновлення
-- PATCH /api/orders/{id}/ — часткове оновлення
-- DELETE /api/orders/{id}/ — видалення
+- PUT /api/orders/{id}/ — повне оновлення (автор або адмін)
+- PATCH /api/orders/{id}/ — часткове оновлення (автор або адмін)
+- DELETE /api/orders/{id}/ — видалення (автор або адмін)
 - GET /api/orders/?status=completed — фільтрація за статусом
-- POST /api/orders/{id}/complete/ — завершити замовлення (власний endpoint)
+- POST /api/orders/{id}/complete/ — завершити замовлення/власний endpoint (автор або адмін)
  
 #### Інвентар
-- GET /api/inventory/ — список інвентарю
-- POST /api/inventory/ — створення запису
+- GET /api/inventory/ — список інвентарю (авторизовані)
+- POST /api/inventory/ — створення запису (персонал)
 - GET /api/inventory/{id}/ — деталі
-- PUT /api/inventory/{id}/ — повне оновлення
-- PATCH /api/inventory/{id}/ — часткове оновлення
-- DELETE /api/inventory/{id}/ — видалення
+- PUT /api/inventory/{id}/ — повне оновлення (персонал)
+- PATCH /api/inventory/{id}/ — часткове оновлення (персонал)
+- DELETE /api/inventory/{id}/ — видалення (персонал)
  
 #### Статистика
 - GET /api/statistics/ — статистика проєкту
@@ -129,6 +129,42 @@ PATCH /api/orders/1/
 {
     "status": "in_progress"
 }
+```
+
+## REST API автентифікація
+
+### Отримання токена
+Для доступу до API необхідно отримати токен:
+POST /api/token/
+{
+"username": "admin",
+"password": "admin123"
+}
+
+ 
+Відповідь:
+```json
+{
+    "token": "ваш_токен"
+}
+```
+
+### Використання токена
+Додайте заголовок до запитів:
+
+Authorization: Token ваш_токен
+
+### Дозволи
+GET запити — авторизовані користувачі
+POST/PUT/PATCH/DELETE — авторизовані користувачі
+Створення клієнтів/послуг/інвентарю — тільки персонал (is_staff)
+Редагування замовлень — тільки автор або адмін
+
+### Тестування
+Запуст тести:
+```bash
+cd myproject
+pytest tests/test_api_auth.py -v
 ```
 
 ## Автентифікація

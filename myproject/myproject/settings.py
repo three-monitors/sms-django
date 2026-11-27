@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",  # додано пакет Django REST Framework
     "drf_spectacular",  # додано пакет для OpenAPI-документації
     "django_filters",  # додано пакет django_filters
+    "rest_framework.authtoken",  # додно Token Authentication для API
 ]
 
 MIDDLEWARE = [
@@ -147,6 +148,13 @@ LOGOUT_REDIRECT_URL = "home"
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ]
 }
 
 SPECTACULAR_SETTINGS = {
